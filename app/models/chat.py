@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import List, Literal
 
 class ChatMessage(BaseModel):
@@ -7,8 +7,3 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: List[ChatMessage]
-    stream: bool = Field(default=True)
-
-class ChatChunk(BaseModel):
-    content: str
-    finished: bool = False
