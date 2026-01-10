@@ -30,7 +30,7 @@ ENV/
 .venv/
 
 # Poetry
-poetry.lock
+# poetry.lock - Keep lock file for reproducible builds
 
 # Testing
 .pytest_cache/
