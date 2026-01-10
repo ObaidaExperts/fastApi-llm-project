@@ -28,7 +28,9 @@ jobs:
         virtualenvs-create: true
         virtualenvs-in-project: true
         installer-parallel: true
-        poetry-version: latest
+
+    - name: Verify Poetry installation
+      run: poetry --version
 
     - name: Set up Poetry cache
       uses: actions/cache@v3
