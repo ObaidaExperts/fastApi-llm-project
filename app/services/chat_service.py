@@ -1,5 +1,7 @@
 import asyncio
+
 from app.core.tracing import get_trace_id
+
 
 async def stream_chat_tokens(prompt: str):
     """

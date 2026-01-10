@@ -11,16 +11,28 @@
           "ms-python.python",
           "ms-python.vscode-pylance",
           "ms-azuretools.vscode-docker",
-          "editorconfig.editorconfig"
+          "editorconfig.editorconfig",
+          "ms-python.black-formatter",
+          "charliermarsh.ruff"
         ],
         "settings": {
           "python.defaultInterpreterPath": "/usr/local/bin/python",
           "python.analysis.typeCheckingMode": "basic",
-          "python.formatting.provider": "black"
+          "python.formatting.provider": "black",
+          "python.linting.enabled": true,
+          "python.linting.ruffEnabled": true,
+          "editor.formatOnSave": true,
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+          },
+          "[python]": {
+            "editor.defaultFormatter": "ms-python.black-formatter",
+            "editor.formatOnSave": true
+          }
         }
       }
     },
-    "postCreateCommand": "pip install -r requirements.txt",
+    "postCreateCommand": "poetry install && poetry run pre-commit install",
     "forwardPorts": [8000],
     "portsAttributes": {
       "8000": {
@@ -29,8 +41,10 @@
       }
     },
     "remoteUser": "vscode",
-    "postStartCommand": "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload",
-"envFile": ".env"
-
+    "postStartCommand": "poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload",
+    "envFile": ".env",
+    "features": {
+      "ghcr.io/devcontainers/features/git:1": {}
+    }
   }
   
