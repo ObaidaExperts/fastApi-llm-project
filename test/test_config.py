@@ -1,8 +1,8 @@
 """
 Unit tests for configuration.
 """
-import pytest
-from app.core.config import Settings, settings
+
+from app.core.config import settings
 
 
 class TestSettings:
@@ -29,14 +29,14 @@ class TestSettings:
 
     def test_settings_oauth_config_exists(self):
         """Test that OAuth configuration exists."""
-        assert hasattr(settings, 'OAUTH_CLIENT_ID')
-        assert hasattr(settings, 'OAUTH_CLIENT_SECRET')
-        assert hasattr(settings, 'OAUTH_AUTHORIZATION_URL')
-        assert hasattr(settings, 'OAUTH_TOKEN_URL')
-        assert hasattr(settings, 'OAUTH_REDIRECT_URI')
+        assert hasattr(settings, "OAUTH_CLIENT_ID")
+        assert hasattr(settings, "OAUTH_CLIENT_SECRET")
+        assert hasattr(settings, "OAUTH_AUTHORIZATION_URL")
+        assert hasattr(settings, "OAUTH_TOKEN_URL")
+        assert hasattr(settings, "OAUTH_REDIRECT_URI")
 
     def test_settings_redis_url_optional(self):
         """Test that Redis URL is optional."""
-        assert hasattr(settings, 'REDIS_URL')
+        assert hasattr(settings, "REDIS_URL")
         # Can be None for in-memory storage
         assert settings.REDIS_URL is None or isinstance(settings.REDIS_URL, str)

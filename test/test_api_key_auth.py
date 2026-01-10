@@ -3,8 +3,8 @@ Unit tests for API key authentication.
 """
 import pytest
 from fastapi import HTTPException, status
-from app.core.api_key_auth import verify_api_key_value, verify_api_key
-from app.core.config import settings
+
+from app.core.api_key_auth import verify_api_key, verify_api_key_value
 
 
 class TestAPIKeyAuth:
@@ -44,7 +44,7 @@ class TestAPIKeyAuth:
         # Test first key
         user_id1 = verify_api_key_value("test-api-key-123")
         assert user_id1 == "user1"
-        
+
         # Test second key
         user_id2 = verify_api_key_value("test-api-key-456")
         assert user_id2 == "user2"
@@ -55,4 +55,4 @@ class TestAPIKeyAuth:
         api_key = "test-api-key-123"
         auth_context = await verify_api_key(api_key)
         assert auth_context.user_id == "user1"
-        assert hasattr(auth_context, 'user_id')
+        assert hasattr(auth_context, "user_id")

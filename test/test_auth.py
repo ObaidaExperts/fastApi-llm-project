@@ -3,6 +3,7 @@ Unit tests for unified authentication system.
 """
 import pytest
 from fastapi import HTTPException, status
+
 from app.core.auth import AuthContext, get_auth_context
 
 

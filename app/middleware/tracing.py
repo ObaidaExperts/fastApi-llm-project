@@ -1,6 +1,8 @@
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
+
 from app.core.tracing import generate_trace_id, set_trace_id
+
 
 class TracingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):

@@ -36,6 +36,5 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies: []
-        args: [--ignore-missing-imports]
+        args: [--ignore-missing-imports, --explicit-package-bases, app]
         pass_filenames: false
-        always_run: false

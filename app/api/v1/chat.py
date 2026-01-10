@@ -1,12 +1,15 @@
 import json
+
 from fastapi import APIRouter, Depends, Header
 from fastapi.responses import StreamingResponse
+
+from app.core.auth import AuthContext, get_auth_context
+from app.core.database import DatabaseSession, get_db
 from app.models.chat import ChatRequest
 from app.services.chat_service import stream_chat_tokens
-from app.core.database import DatabaseSession, get_db
-from app.core.auth import AuthContext, get_auth_context
 
 router = APIRouter(prefix="/chat")
+
 
 @router.post("/stream")
 async def chat_stream(

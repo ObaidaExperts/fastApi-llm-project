@@ -1,11 +1,12 @@
 """
 Pytest configuration and shared fixtures.
 """
+from unittest.mock import patch
+
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import Mock, patch
+
 from app.main import app
-from app.core.config import settings
 
 
 @pytest.fixture
@@ -29,17 +30,13 @@ def mock_oauth_token():
 @pytest.fixture
 def mock_chat_request():
     """Return a mock chat request payload."""
-    return {
-        "messages": [
-            {"role": "user", "content": "Hello, how are you?"}
-        ]
-    }
+    return {"messages": [{"role": "user", "content": "Hello, how are you?"}]}
 
 
 @pytest.fixture
 def mock_settings():
     """Mock settings for testing."""
-    with patch('app.core.config.settings') as mock:
+    with patch("app.core.config.settings") as mock:
         mock.API_KEYS = {
             "test-api-key-123": "user1",
             "test-api-key-456": "user2",

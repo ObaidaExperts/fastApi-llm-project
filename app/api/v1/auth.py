@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
+
 from app.core.config import settings
 from app.core.oauth import oauth2_scheme
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
+
 
 @router.get("/login")
 async def oauth_login():
@@ -20,6 +22,7 @@ async def oauth_login():
     )
     return RedirectResponse(url=auth_url)
 
+
 @router.get("/callback")
 async def oauth_callback(code: str):
     """
@@ -34,12 +37,14 @@ async def oauth_callback(code: str):
         "expires_in": 3600,
     }
 
+
 @router.get("/me")
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     """
     Get current authenticated user info.
     """
     from app.core.oauth import verify_oauth_token
+
     auth_context = await verify_oauth_token(token)
     return {
         "user_id": auth_context.user_id,

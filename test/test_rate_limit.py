@@ -1,13 +1,14 @@
 """
 Unit tests for rate limiting middleware.
 """
-import pytest
 import time
+from unittest.mock import Mock, patch
+
+import pytest
 from fastapi import Request
 from starlette.responses import Response
-from unittest.mock import Mock, patch, AsyncMock
+
 from app.middleware.rate_limit import RateLimitMiddleware, get_rate_limit_key
-from app.core.config import settings
 
 
 class TestRateLimitKey:
@@ -18,7 +19,7 @@ class TestRateLimitKey:
         request = Mock(spec=Request)
         request.state.user_id = "user1"
         request.state.auth_method = "api_key"
-        
+
         key = get_rate_limit_key(request)
         assert key == "user:user1"
 
@@ -29,11 +30,11 @@ class TestRateLimitKey:
         request.client.host = "127.0.0.1"
         # Ensure state doesn't have user_id
         request.state = Mock()
-        if hasattr(request.state, 'user_id'):
-            delattr(request.state, 'user_id')
-        
+        if hasattr(request.state, "user_id"):
+            delattr(request.state, "user_id")
+
         # Mock get_remote_address function
-        with patch('app.middleware.rate_limit.get_remote_address', return_value="127.0.0.1"):
+        with patch("app.middleware.rate_limit.get_remote_address", return_value="127.0.0.1"):
             key = get_rate_limit_key(request)
             assert key == "127.0.0.1"
 
@@ -58,8 +59,10 @@ class TestRateLimitMiddleware:
     @pytest.fixture
     def mock_call_next(self):
         """Create a mock call_next function."""
+
         async def call_next(request):
             return Response(content="OK", status_code=200)
+
         return call_next
 
     @pytest.mark.asyncio
@@ -67,7 +70,7 @@ class TestRateLimitMiddleware:
         """Test that health endpoint bypasses rate limiting."""
         request = Mock(spec=Request)
         request.url.path = "/api/v1/health"
-        
+
         response = await middleware.dispatch(request, mock_call_next)
         assert response.status_code == 200
 
@@ -76,7 +79,7 @@ class TestRateLimitMiddleware:
         """Test that docs endpoint bypasses rate limiting."""
         request = Mock(spec=Request)
         request.url.path = "/docs"
-        
+
         response = await middleware.dispatch(request, mock_call_next)
         assert response.status_code == 200
 
@@ -85,8 +88,9 @@ class TestRateLimitMiddleware:
         """Test that requests within limit are allowed."""
         # Reset storage
         from app.middleware.rate_limit import limiter
+
         limiter.storage = {}
-        
+
         response = await middleware.dispatch(mock_request, mock_call_next)
         assert response.status_code == 200
         assert "X-RateLimit-Limit-Minute" in response.headers
@@ -95,23 +99,24 @@ class TestRateLimitMiddleware:
     @pytest.mark.asyncio
     async def test_rate_limit_exceeded_minute(self, middleware, mock_request, mock_call_next):
         """Test that requests exceeding minute limit are blocked."""
-        from app.middleware.rate_limit import limiter
-        from app.core.config import settings
         from fastapi import HTTPException
-        
+
+        from app.core.config import settings
+        from app.middleware.rate_limit import limiter
+
         # Reset storage
         limiter.storage = {}
-        
+
         # Set up to exceed minute limit
         key = get_rate_limit_key(mock_request)
         minute_key = f"{key}:minute"
         current_time = time.time()
-        
+
         limiter.storage[minute_key] = {
             "count": settings.RATE_LIMIT_PER_MINUTE,
-            "reset": current_time + 60
+            "reset": current_time + 60,
         }
-        
+
         with pytest.raises(HTTPException) as exc_info:
             await middleware.dispatch(mock_request, mock_call_next)
         # Should raise HTTPException with 429 status
@@ -122,10 +127,11 @@ class TestRateLimitMiddleware:
     async def test_rate_limit_headers_present(self, middleware, mock_request, mock_call_next):
         """Test that rate limit headers are present in response."""
         from app.middleware.rate_limit import limiter
+
         limiter.storage = {}
-        
+
         response = await middleware.dispatch(mock_request, mock_call_next)
-        
+
         assert "X-RateLimit-Limit-Minute" in response.headers
         assert "X-RateLimit-Limit-Hour" in response.headers
         assert "X-RateLimit-Remaining-Minute" in response.headers

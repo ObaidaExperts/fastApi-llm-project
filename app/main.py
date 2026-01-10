@@ -1,9 +1,10 @@
 from fastapi import FastAPI
+
 from app.api.router import api_router
-from app.middleware.tracing import TracingMiddleware
-from app.middleware.rate_limit import RateLimitMiddleware
-from app.middleware.auth_middleware import AuthMiddleware
 from app.core.config import settings
+from app.middleware.auth_middleware import AuthMiddleware
+from app.middleware.rate_limit import RateLimitMiddleware
+from app.middleware.tracing import TracingMiddleware
 
 app = FastAPI(title="AI Chat Service")
 

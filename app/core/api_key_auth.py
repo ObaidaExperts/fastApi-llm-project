@@ -1,8 +1,10 @@
 from fastapi import HTTPException, Security, status
 from fastapi.security import APIKeyHeader
+
 from app.core.config import settings
 
 api_key_header = APIKeyHeader(name=settings.API_KEY_HEADER, auto_error=False)
+
 
 def verify_api_key_value(api_key: str):
     """
@@ -15,7 +17,7 @@ def verify_api_key_value(api_key: str):
             detail="API key is missing",
             headers={"WWW-Authenticate": "ApiKey"},
         )
-    
+
     user_id = settings.API_KEYS.get(api_key)
     if not user_id:
         raise HTTPException(
@@ -23,8 +25,9 @@ def verify_api_key_value(api_key: str):
             detail="Invalid API key",
             headers={"WWW-Authenticate": "ApiKey"},
         )
-    
+
     return user_id
+
 
 async def verify_api_key(api_key: str = Security(api_key_header)):
     """
@@ -32,5 +35,6 @@ async def verify_api_key(api_key: str = Security(api_key_header)):
     Returns AuthContext if valid, raises HTTPException if invalid.
     """
     from app.core.auth import AuthContext
+
     user_id = verify_api_key_value(api_key)
     return AuthContext(user_id=user_id)

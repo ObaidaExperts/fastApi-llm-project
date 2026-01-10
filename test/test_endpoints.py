@@ -1,9 +1,10 @@
 """
 Unit tests for API endpoints.
 """
+
 import pytest
-import json
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 
@@ -18,18 +19,14 @@ class TestChatEndpoint:
     @pytest.fixture
     def chat_request_payload(self):
         """Create chat request payload."""
-        return {
-            "messages": [
-                {"role": "user", "content": "Hello, how are you?"}
-            ]
-        }
+        return {"messages": [{"role": "user", "content": "Hello, how are you?"}]}
 
     def test_chat_endpoint_with_api_key(self, client, chat_request_payload):
         """Test chat endpoint with valid API key."""
         response = client.post(
             "/api/v1/chat/stream",
             headers={"X-API-Key": "test-api-key-123"},
-            json=chat_request_payload
+            json=chat_request_payload,
         )
         assert response.status_code == 200
         assert "X-Auth-Method" in response.headers
@@ -41,7 +38,7 @@ class TestChatEndpoint:
         response = client.post(
             "/api/v1/chat/stream",
             headers={"Authorization": "Bearer oauth_test123"},
-            json=chat_request_payload
+            json=chat_request_payload,
         )
         assert response.status_code == 200
         assert "X-Auth-Method" in response.headers
@@ -49,18 +46,13 @@ class TestChatEndpoint:
 
     def test_chat_endpoint_no_auth(self, client, chat_request_payload):
         """Test chat endpoint without authentication."""
-        response = client.post(
-            "/api/v1/chat/stream",
-            json=chat_request_payload
-        )
+        response = client.post("/api/v1/chat/stream", json=chat_request_payload)
         assert response.status_code == 401
 
     def test_chat_endpoint_invalid_api_key(self, client, chat_request_payload):
         """Test chat endpoint with invalid API key."""
         response = client.post(
-            "/api/v1/chat/stream",
-            headers={"X-API-Key": "invalid-key"},
-            json=chat_request_payload
+            "/api/v1/chat/stream", headers={"X-API-Key": "invalid-key"}, json=chat_request_payload
         )
         assert response.status_code == 401
 
@@ -69,7 +61,7 @@ class TestChatEndpoint:
         response = client.post(
             "/api/v1/chat/stream",
             headers={"Authorization": "Bearer invalid_token"},
-            json=chat_request_payload
+            json=chat_request_payload,
         )
         assert response.status_code == 401
 
@@ -78,7 +70,7 @@ class TestChatEndpoint:
         response = client.post(
             "/api/v1/chat/stream",
             headers={"X-API-Key": "test-api-key-123"},
-            json=chat_request_payload
+            json=chat_request_payload,
         )
         assert response.status_code == 200
         assert "Cache-Control" in response.headers
@@ -118,10 +110,7 @@ class TestAuthEndpoints:
         """Test OAuth me endpoint with valid token."""
         # Note: This will fail if OAuth token verification is strict
         # For demo purposes, we use a simple token format
-        response = client.get(
-            "/api/v1/auth/me",
-            headers={"Authorization": "Bearer oauth_test123"}
-        )
+        response = client.get("/api/v1/auth/me", headers={"Authorization": "Bearer oauth_test123"})
         # May return 401 if token verification is strict
         # This is expected behavior for demo implementation
         assert response.status_code in [200, 401]

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+
 from app.core.database import DatabaseSession, get_db
 from app.core.tracing import get_trace_id
 

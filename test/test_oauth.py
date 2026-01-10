@@ -3,7 +3,8 @@ Unit tests for OAuth authentication.
 """
 import pytest
 from fastapi import HTTPException, status
-from app.core.oauth import verify_bearer_token, verify_oauth_token
+
+from app.core.oauth import verify_bearer_token
 
 
 class TestOAuthAuth:
@@ -56,7 +57,7 @@ class TestOAuthAuth:
         # Test with oauth_ prefix
         auth1 = await verify_bearer_token("Bearer oauth_user1")
         assert auth1.user_id == "user_user1"
-        
+
         # Test with oauth_ prefix and numbers
         auth2 = await verify_bearer_token("Bearer oauth_12345")
         assert auth2.user_id == "user_12345"
