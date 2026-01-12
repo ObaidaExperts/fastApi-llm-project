@@ -33,13 +33,12 @@ async def verify_oauth_token(token: str = Depends(oauth2_scheme)):
             algorithms=["HS256"],
             options={"verify_signature": False},  # For demo - use proper verification in production
         )
-        user_id: str = payload.get("sub") or payload.get("user_id")
+        user_id: str | None = payload.get("sub") or payload.get("user_id")
         if user_id is None:
             raise credentials_exception
+        return AuthContext(user_id=user_id)
     except JWTError as err:
         raise credentials_exception from err
-
-    return AuthContext(user_id=user_id)
 
 
 # Alternative: Simple bearer token verification (for non-JWT tokens)

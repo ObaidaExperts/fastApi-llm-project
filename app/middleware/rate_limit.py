@@ -1,5 +1,5 @@
 import time
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 
 from fastapi import HTTPException, Request, status
 from slowapi import Limiter
@@ -17,8 +17,8 @@ if settings.REDIS_URL:
     # Configure Redis storage if available
     pass
 else:
-    # Use in-memory storage
-    limiter.storage = {}
+    # Use in-memory storage (type ignore for private attribute)
+    limiter.storage = {}  # type: ignore[attr-defined]
 
 
 def get_rate_limit_key(request: Request) -> str:
@@ -40,7 +40,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     Limits requests per minute and per hour.
     """
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         # Skip rate limiting for health checks
         if request.url.path in ["/api/v1/health", "/docs", "/openapi.json", "/redoc"]:
             return await call_next(request)
@@ -50,14 +50,15 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         # Check per-minute limit
         minute_key = f"{key}:minute"
-        minute_count = limiter.storage.get(minute_key, {}).get("count", 0)
-        minute_reset = limiter.storage.get(minute_key, {}).get("reset", 0)
+        storage = limiter.storage  # type: ignore[attr-defined]
+        minute_count = storage.get(minute_key, {}).get("count", 0)
+        minute_reset = storage.get(minute_key, {}).get("reset", 0)
 
         current_time = time.time()
 
         if minute_reset < current_time:
             # Reset minute counter
-            limiter.storage[minute_key] = {"count": 1, "reset": current_time + 60}
+            storage[minute_key] = {"count": 1, "reset": current_time + 60}
         else:
             if minute_count >= settings.RATE_LIMIT_PER_MINUTE:
                 raise HTTPException(
@@ -69,16 +70,16 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                         "X-RateLimit-Reset": str(int(minute_reset)),
                     },
                 )
-            limiter.storage[minute_key]["count"] += 1
+            storage[minute_key]["count"] += 1
 
         # Check per-hour limit
         hour_key = f"{key}:hour"
-        hour_count = limiter.storage.get(hour_key, {}).get("count", 0)
-        hour_reset = limiter.storage.get(hour_key, {}).get("reset", 0)
+        hour_count = storage.get(hour_key, {}).get("count", 0)
+        hour_reset = storage.get(hour_key, {}).get("reset", 0)
 
         if hour_reset < current_time:
             # Reset hour counter
-            limiter.storage[hour_key] = {"count": 1, "reset": current_time + 3600}
+            storage[hour_key] = {"count": 1, "reset": current_time + 3600}
         else:
             if hour_count >= settings.RATE_LIMIT_PER_HOUR:
                 raise HTTPException(
@@ -90,7 +91,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                         "X-RateLimit-Reset": str(int(hour_reset)),
                     },
                 )
-            limiter.storage[hour_key]["count"] += 1
+            storage[hour_key]["count"] += 1
 
         response = await call_next(request)
 
@@ -98,10 +99,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         response.headers["X-RateLimit-Limit-Minute"] = str(settings.RATE_LIMIT_PER_MINUTE)
         response.headers["X-RateLimit-Limit-Hour"] = str(settings.RATE_LIMIT_PER_HOUR)
         response.headers["X-RateLimit-Remaining-Minute"] = str(
-            max(0, settings.RATE_LIMIT_PER_MINUTE - limiter.storage[minute_key]["count"])
+            max(0, settings.RATE_LIMIT_PER_MINUTE - storage[minute_key]["count"])
         )
         response.headers["X-RateLimit-Remaining-Hour"] = str(
-            max(0, settings.RATE_LIMIT_PER_HOUR - limiter.storage[hour_key]["count"])
+            max(0, settings.RATE_LIMIT_PER_HOUR - storage[hour_key]["count"])
         )
 
         return response
