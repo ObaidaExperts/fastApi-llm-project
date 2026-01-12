@@ -48,12 +48,10 @@ async def get_auth_context(
 # Separate dependencies for explicit auth method selection
 async def require_api_key() -> AuthContext:
     """Dependency that requires API key authentication."""
-    from fastapi import Depends, Request
 
     # Create a mock request for the security scheme
     # In practice, this should be used as a dependency with Depends()
     # For now, we'll use the direct verification approach
-    from app.core.api_key_auth import api_key_header, verify_api_key, verify_api_key_value
 
     # This function should be used with Depends(api_key_header) in actual endpoints
     # For standalone use, we need to get the API key differently
@@ -64,9 +62,7 @@ async def require_api_key() -> AuthContext:
 
 async def require_oauth() -> AuthContext:
     """Dependency that requires OAuth authentication."""
-    from fastapi import Depends
 
-    from app.core.oauth import oauth2_scheme, verify_oauth_token
 
     # This function should be used with Depends(oauth2_scheme) in actual endpoints
     # For standalone use, we need to get the token differently
