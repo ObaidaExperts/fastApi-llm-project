@@ -40,7 +40,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     Limits requests per minute and per hour.
     """
 
-    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
         # Skip rate limiting for health checks
         if request.url.path in ["/api/v1/health", "/docs", "/openapi.json", "/redoc"]:
             return await call_next(request)

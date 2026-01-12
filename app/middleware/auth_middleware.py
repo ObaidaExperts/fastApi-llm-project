@@ -13,7 +13,9 @@ class AuthMiddleware(BaseHTTPMiddleware):
     This allows rate limiting to use user-based keys.
     """
 
-    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
         # Skip auth extraction for public endpoints
         public_paths = [
             "/api/v1/health",
