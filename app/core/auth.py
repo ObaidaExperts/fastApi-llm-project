@@ -63,7 +63,6 @@ async def require_api_key() -> AuthContext:
 async def require_oauth() -> AuthContext:
     """Dependency that requires OAuth authentication."""
 
-
     # This function should be used with Depends(oauth2_scheme) in actual endpoints
     # For standalone use, we need to get the token differently
     raise NotImplementedError(
