@@ -1,0 +1,42 @@
+[Unit]
+Description=FastAPI LLM Service (Gunicorn)
+After=network.target
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/fastapi-llm-project
+Environment="PATH=/opt/fastapi-llm-project/.venv/bin"
+Environment="PYTHONPATH=/opt/fastapi-llm-project"
+ExecStart=/opt/fastapi-llm-project/.venv/bin/gunicorn \
+    --config /opt/fastapi-llm-project/gunicorn.conf.py \
+    app.main:app
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=always
+RestartSec=10
+
+# Security settings
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/fastapi-llm-project
+ReadOnlyPaths=/usr /etc
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictRealtime=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target
