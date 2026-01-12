@@ -12,7 +12,19 @@ async def oauth_login():
     """
     Initiate OAuth login flow.
     Redirects to OAuth provider authorization URL.
+    In demo mode (when OAuth URL is a placeholder), redirects to callback with demo code.
     """
+    # Check if we're in demo mode (placeholder OAuth URL)
+    if (
+        "oauth.provider.com" in settings.OAUTH_AUTHORIZATION_URL
+        or settings.OAUTH_CLIENT_ID == "your-client-id"
+    ):
+        # Demo mode: redirect directly to callback with a demo authorization code
+        demo_code = "demo_auth_code_12345"
+        callback_url = f"{settings.OAUTH_REDIRECT_URI}?code={demo_code}"
+        return RedirectResponse(url=callback_url)
+
+    # Production mode: redirect to actual OAuth provider
     auth_url = (
         f"{settings.OAUTH_AUTHORIZATION_URL}"
         f"?client_id={settings.OAUTH_CLIENT_ID}"
