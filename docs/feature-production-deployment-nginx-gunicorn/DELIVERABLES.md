@@ -4,6 +4,16 @@
 
 Implementation of production-ready deployment configuration using Gunicorn as ASGI server and Nginx as reverse proxy, with performance and security optimizations.
 
+### What are Gunicorn and Nginx?
+
+**Gunicorn** (Green Unicorn) is a Python WSGI/ASGI HTTP Server for UNIX that runs Python web applications. It manages multiple worker processes to handle concurrent requests, provides process management, and integrates seamlessly with FastAPI through Uvicorn workers. Gunicorn is production-ready, handling worker lifecycle, graceful restarts, and process monitoring [1].
+
+**Nginx** is a high-performance web server and reverse proxy that acts as a front-end server handling client requests and forwarding them to backend application servers like Gunicorn. It provides SSL termination, load balancing, rate limiting, static file serving, and caching. In this setup, Nginx receives all client requests, applies security policies and rate limiting, then proxies requests to Gunicorn workers, significantly improving performance and security [2].
+
+**References:**
+- [1] Gunicorn Documentation: https://docs.gunicorn.org/
+- [2] Nginx Documentation: https://nginx.org/en/docs/
+
 ---
 
 ## 1. What Was Done
