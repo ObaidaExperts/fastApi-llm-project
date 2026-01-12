@@ -6,7 +6,14 @@ from app.middleware.auth_middleware import AuthMiddleware
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.middleware.tracing import TracingMiddleware
 
-app = FastAPI(title="AI Chat Service")
+app = FastAPI(
+    title="AI Chat Service",
+    description="A FastAPI-based AI Chat Service with streaming support, authentication, and rate limiting",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
+)
 
 # Middleware order matters: Auth -> Rate Limit -> Tracing
 app.add_middleware(AuthMiddleware)
