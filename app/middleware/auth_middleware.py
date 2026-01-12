@@ -15,7 +15,15 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         # Skip auth extraction for public endpoints
-        if request.url.path in ["/api/v1/health", "/docs", "/openapi.json", "/redoc"]:
+        public_paths = [
+            "/api/v1/health",
+            "/api/v1/auth/login",
+            "/api/v1/auth/callback",
+            "/docs",
+            "/openapi.json",
+            "/redoc",
+        ]
+        if request.url.path in public_paths:
             return await call_next(request)
 
         # Try to extract auth info (but don't fail if not present)
