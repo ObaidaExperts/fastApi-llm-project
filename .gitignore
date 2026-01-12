@@ -73,3 +73,4 @@ Thumbs.db
 # Project specific
 htmlcov/
 coverage.xml
+openapi_schema.json

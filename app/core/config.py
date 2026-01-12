@@ -1,5 +1,4 @@
-from pydantic import ConfigDict
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -23,7 +22,7 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_HOUR: int = 1000
     REDIS_URL: str | None = None  # Optional: "redis://localhost:6379"
 
-    model_config = ConfigDict(env_file=".env", case_sensitive=True)
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
 
 settings = Settings()

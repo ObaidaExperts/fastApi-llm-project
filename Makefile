@@ -44,6 +44,18 @@ type-check: ## Run type checking with mypy
 
 precommit: format-check lint type-check test ## Run all pre-commit checks
 
+validate-openapi: ## Validate OpenAPI schema generation
+	poetry run python scripts/validate_openapi.py
+
+ci-check: ## Run all CI checks locally (format, lint, type-check, test, validate-openapi)
+	@echo "Running all CI checks locally..."
+	@make format-check
+	@make lint
+	@make type-check
+	@make test-cov
+	@make validate-openapi
+	@echo "✅ All CI checks passed!"
+
 clean: ## Clean cache files and build artifacts
 	find . -type d -name "__pycache__" -exec rm -r {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete

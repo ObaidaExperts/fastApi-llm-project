@@ -31,9 +31,9 @@ async def get_auth_context(
     # Try OAuth Bearer token authentication
     if authorization and authorization.startswith("Bearer "):
         try:
-            auth_context = await verify_bearer_token(authorization)
-            auth_context.auth_method = "oauth"
-            return auth_context
+            auth_context_result: AuthContext = await verify_bearer_token(authorization)
+            auth_context_result.auth_method = "oauth"
+            return auth_context_result
         except HTTPException:
             pass
 
@@ -49,14 +49,22 @@ async def get_auth_context(
 async def require_api_key() -> AuthContext:
     """Dependency that requires API key authentication."""
 
-    from app.core.api_key_auth import api_key_header, verify_api_key
+    # Create a mock request for the security scheme
+    # In practice, this should be used as a dependency with Depends()
+    # For now, we'll use the direct verification approach
 
-    return await verify_api_key(await api_key_header())
+    # This function should be used with Depends(api_key_header) in actual endpoints
+    # For standalone use, we need to get the API key differently
+    raise NotImplementedError(
+        "Use Depends(verify_api_key) or get_auth_context() instead of require_api_key()"
+    )
 
 
 async def require_oauth() -> AuthContext:
     """Dependency that requires OAuth authentication."""
 
-    from app.core.oauth import oauth2_scheme, verify_oauth_token
-
-    return await verify_oauth_token(await oauth2_scheme())
+    # This function should be used with Depends(oauth2_scheme) in actual endpoints
+    # For standalone use, we need to get the token differently
+    raise NotImplementedError(
+        "Use Depends(verify_oauth_token) or get_auth_context() instead of require_oauth()"
+    )
