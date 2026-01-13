@@ -1,14 +1,60 @@
 # Docker Installation Guide
 
-## Docker Not Available in Current Environment
+## Docker in Dev Container Environment
 
-Docker is not currently installed in this development environment. This guide provides instructions for installing Docker and testing the containerization setup.
+**Note**: You are currently working in a VS Code Dev Container. Docker is not installed inside the dev container by default. This guide provides options for testing Docker builds in this environment.
 
 ---
 
-## Installation Options
+## Options for Dev Container Users
 
-### Option 1: Docker Desktop (Recommended for Windows/Mac)
+### Option 1: Use Docker from Host Machine (Recommended)
+
+Since you're in a dev container, you can use Docker from your host machine:
+
+**Windows/Mac with Docker Desktop**:
+1. Ensure Docker Desktop is running on your host machine
+2. Build and test Docker images from your host terminal (outside the dev container)
+3. Or configure dev container to mount Docker socket (see Option 3)
+
+**From Host Terminal**:
+```bash
+# Navigate to project directory on host
+cd /path/to/fastApi-llm-project
+
+# Build Docker image
+docker build -t fastapi-llm-project:latest .
+
+# Run container
+docker run -p 8000:8000 fastapi-llm-project:latest
+```
+
+### Option 2: Configure Dev Container with Docker-in-Docker
+
+Add Docker support to your dev container by updating `.devcontainer/devcontainer.json`:
+
+```json
+{
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind"
+  ]
+}
+```
+
+Then rebuild your dev container. Docker will be available inside the container.
+
+### Option 3: Install Docker in Dev Container (Not Recommended)
+
+You can install Docker inside the dev container, but this is not recommended as it requires privileged mode.
+
+---
+
+## Installation Options (For Host Machine)
+
+### Option A: Docker Desktop (Recommended for Windows/Mac)
 
 **Windows (WSL2)**:
 1. Download Docker Desktop from: https://www.docker.com/products/docker-desktop
@@ -146,21 +192,21 @@ hadolint Dockerfile
 
 ---
 
-## Alternative: Test Without Docker
+## Alternative: Test Without Docker (In Dev Container)
 
-You can still verify the application works locally:
+You can verify the application and health endpoints work without Docker:
 
 ```bash
-# Install dependencies
-poetry install
+# Dependencies are already installed in dev container
+# Just run the application
+poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-# Run application
-poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000
-
-# Test health endpoints
+# Test health endpoints (in another terminal or from host)
 curl http://localhost:8000/api/v1/health
 curl http://localhost:8000/api/v1/ready
 ```
+
+**Note**: The dev container is configured to auto-start the application on port 8000, so you may already have it running!
 
 ---
 
