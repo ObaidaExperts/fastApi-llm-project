@@ -19,6 +19,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         # Skip auth extraction for public endpoints
         public_paths = [
             "/api/v1/health",
+            "/api/v1/ready",
             "/api/v1/auth/login",
             "/api/v1/auth/callback",
             "/docs",

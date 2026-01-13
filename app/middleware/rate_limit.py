@@ -28,10 +28,12 @@ def get_rate_limit_key(request: Request) -> str:
     """
     # Try to get user ID from request state (set by auth)
     if hasattr(request.state, "user_id"):
-        return f"user:{request.state.user_id}"
+        user_id: str = getattr(request.state, "user_id", "")
+        return f"user:{user_id}"
 
     # Fall back to IP address
-    return get_remote_address(request)
+    ip_address: str = get_remote_address(request)
+    return ip_address
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
@@ -44,7 +46,13 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
         # Skip rate limiting for health checks
-        if request.url.path in ["/api/v1/health", "/docs", "/openapi.json", "/redoc"]:
+        if request.url.path in [
+            "/api/v1/health",
+            "/api/v1/ready",
+            "/docs",
+            "/openapi.json",
+            "/redoc",
+        ]:
             return await call_next(request)
 
         # Get rate limit key

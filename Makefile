@@ -1,4 +1,4 @@
-.PHONY: help install install-dev run test lint format format-check type-check precommit clean docker-build docker-run
+.PHONY: help install install-dev run test lint format format-check type-check precommit clean docker-build docker-run docker-up docker-down docker-logs
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -72,6 +72,15 @@ docker-build: ## Build Docker image
 
 docker-run: ## Run Docker container
 	docker run -p 8000:8000 --env-file .env fastapi-llm-project:latest
+
+docker-up: ## Start services with docker-compose
+	docker-compose up -d
+
+docker-down: ## Stop services with docker-compose
+	docker-compose down
+
+docker-logs: ## View docker-compose logs
+	docker-compose logs -f
 
 shell: ## Open a shell with poetry environment activated
 	poetry shell
