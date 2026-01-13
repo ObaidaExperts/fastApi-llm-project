@@ -1,5 +1,5 @@
 # Multi-stage build for FastAPI application
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -54,9 +54,11 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application code
 COPY --chown=appuser:appuser . .
 
+# Configure Poetry: Don't create virtual environment, install to system
+RUN poetry config virtualenvs.create false
+
 # Install application
-RUN poetry install --no-interaction --only=main && \
-    poetry run pip install --user --no-deps .
+RUN poetry install --no-interaction --only=main
 
 # Switch to non-root user
 USER appuser
