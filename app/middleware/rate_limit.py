@@ -46,7 +46,13 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
         # Skip rate limiting for health checks
-        if request.url.path in ["/api/v1/health", "/api/v1/ready", "/docs", "/openapi.json", "/redoc"]:
+        if request.url.path in [
+            "/api/v1/health",
+            "/api/v1/ready",
+            "/docs",
+            "/openapi.json",
+            "/redoc",
+        ]:
             return await call_next(request)
 
         # Get rate limit key
